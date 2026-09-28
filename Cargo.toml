@@ -1,0 +1,23 @@
+[package]
+name = "rust_background_clicker"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+iced = { version = "0.12", features = ["tokio"] }
+rdev = "0.5.3"
+tokio = { version = "1.0", features = ["full"] }
+
+[dependencies.windows]
+version = "0.52.0"
+features = [
+    "Win32_Foundation",
+    "Win32_UI_WindowsAndMessaging",
+]
+
+# Tambahkan baris optimasi rilis agresif ini di paling bawah:
+[profile.release]
+opt-level = "z"         # Fokus kompilasi untuk ukuran terkecil
+lto = true              # Link-Time Optimization global untuk menghapus dead-code
+codegen-units = 1       # Reduksi paralelisasi demi efisiensi biner maksimum
+panic = "abort"         # Hapus unrolling stack memory saat crash untuk menghemat RAM

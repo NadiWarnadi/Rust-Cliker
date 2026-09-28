@@ -1,0 +1,35 @@
+name: Build Release Executable
+
+on:
+  push:
+    branches: [ "main" ] # Memicu build otomatis setiap kali Anda melakukan push ke branch main
+  workflow_dispatch:     # Memungkinkan Anda memicu build secara manual dari tombol di web GitHub
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v4
+
+    - name: Setup Rust Toolchain
+      uses: dtolnay/rust-toolchain@stable
+
+    - name: Cache Cargo Dependencies
+      uses: actions/cache@v4
+      with:
+        path: |
+          ~/.cargo/registry
+          ~/.cargo/git
+          target
+        key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.toml') }}
+
+    - name: Compile Code to Optimized Release
+      run: cargo build --release
+
+    - name: Upload Compiled .EXE Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: rust_background_clicker_exe
+        path: target/release/rust_background_clicker.exe

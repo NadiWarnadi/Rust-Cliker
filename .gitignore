@@ -1,0 +1,18 @@
+# Mengabaikan folder hasil kompilasi (wajib untuk Rust)
+/target/
+
+# Mengabaikan file kunci Cargo jika Anda membuat aplikasi/binary (opsional, tapi disarankan)
+# Cargo.lock
+
+# Mengabaikan file log kesalahan jika terjadi crash pada compiler
+**/*.rs.bk
+cargo-timing.html
+
+# Mengabaikan file konfigurasi lokal dari VS Code atau IDE lain
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.swp
