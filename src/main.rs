@@ -1,17 +1,30 @@
-// src/main.rs
-#![windows_subsystem = "windows"]
-
 mod config;
-mod app;
-mod worker;
+mod clicker;
+mod listener;
 
-use iced::{Application, Settings, Size};
-use app::ClickerApp;
+use config::{ClickType, ClickerConfig};
+use rdev::Key;
+use std::sync::atomic::AtomicBool;
+use std::sync::Arc;
 
-pub fn main() -> iced::Result {
-    let mut settings = Settings::default();
-    settings.window.size = Size::new(400.0, 420.0);
-    settings.window.resizable = false;
-    
-    ClickerApp::run(settings)
+fn main() {
+    // 1. Inisialisasi Konfigurasi (Contoh: 10 CPS, Klik Kiri)
+    let config = ClickerConfig::new(10, ClickType::Left);
+
+    // 2. Shared State untuk Status Aktif/Nonaktif (Thread-Safe)
+    let running = Arc::new(AtomicBool::new(false));
+
+    println!("==================================================");
+    println!("       RUST AUTOCLICKER - SYSTEM ARCHITECTURE    ");
+    println!("==================================================");
+    println!(" Configuration : {} CPS | Type: {:?}", config.cps, config.click_type);
+    println!(" Hotkey        : Press [F8] to Start / Stop");
+    println!(" Quit          : Press [Ctrl + C] in terminal");
+    println!("==================================================");
+
+    // 3. Jalankan Worker Thread untuk Simulasi Klik
+    clicker::start_clicker_thread(Arc::clone(&running), config);
+
+    // 4. Jalankan Listener Thread di Main Thread (Blocking)
+    listener::start_hotkey_listener(Arc::clone(&running), Key::F8);
 }

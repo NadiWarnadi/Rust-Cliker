@@ -1,35 +1,42 @@
-name: Build Release Executable
+name: Build Rust Autoclicker Windows Executable
 
+# Trigger: Workflow akan berjalan setiap kali ada 'push' atau 'pull request' ke branch main,
+# serta mendukung penjalanan manual melalui tab Actions di GitHub.
 on:
   push:
-    branches: [ "main" ] # Memicu build otomatis setiap kali Anda melakukan push ke branch main
-  workflow_dispatch:     # Memungkinkan Anda memicu build secara manual dari tombol di web GitHub
+    branches: [ "main", "master" ]
+  pull_request:
+    branches: [ "main", "master" ]
+  workflow_dispatch:
 
 jobs:
   build-windows:
+    name: Build Release (.exe) on Windows
     runs-on: windows-latest
 
     steps:
-    - name: Checkout Repository
-      uses: actions/checkout@v4
+      # Langkah 1: Checkout repository kode dari GitHub
+      - name: Checkout Repository
+        uses: actions/checkout@v4
 
-    - name: Setup Rust Toolchain
-      uses: dtolnay/rust-toolchain@stable
+      # Langkah 2: Setup Toolchain Rust
+      - name: Install Rust Toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: x86_64-pc-windows-msvc
 
-    - name: Cache Cargo Dependencies
-      uses: actions/cache@v4
-      with:
-        path: |
-          ~/.cargo/registry
-          ~/.cargo/git
-          target
-        key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.toml') }}
+      # Langkah 3: Caching dependensi Cargo agar kompilasi berikutnya jauh lebih cepat
+      - name: Cache Cargo Dependencies
+        uses: Swatinem/rust-cache@v2
 
-    - name: Compile Code to Optimized Release
-      run: cargo build --release
+      # Langkah 4: Kompilasi aplikasi dalam mode Release (Dioptimalkan)
+      - name: Build Executable
+        run: cargo build --release
 
-    - name: Upload Compiled .EXE Artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: rust_background_clicker_exe
-        path: target/release/rust_background_clicker.exe
+      # Langkah 5: Upload hasil file .exe ke Artifacts GitHub (Bisa diunduh langsung)
+      - name: Upload Windows Binary Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Autoclicker-Windows-x64
+          path: target/release/autoclicker.exe
+          if-no-files-found: error
